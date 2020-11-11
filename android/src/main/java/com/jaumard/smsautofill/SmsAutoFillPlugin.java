@@ -132,6 +132,7 @@ public class SmsAutoFillPlugin implements MethodCallHandler {
 
     @TargetApi(Build.VERSION_CODES.ECLAIR)
     private void requestHint() {
+        try {
         HintRequest hintRequest = new HintRequest.Builder()
                 .setPhoneNumberIdentifierSupported(true)
                 .build();
@@ -140,7 +141,7 @@ public class SmsAutoFillPlugin implements MethodCallHandler {
                 .build();
         PendingIntent intent = Auth.CredentialsApi.getHintPickerIntent(
                 mCredentialsClient, hintRequest);
-        try {
+
             activity.startIntentSenderForResult(intent.getIntentSender(),
                     PHONE_HINT_REQUEST, null, 0, 0, 0);
         } catch (IntentSender.SendIntentException e) {
