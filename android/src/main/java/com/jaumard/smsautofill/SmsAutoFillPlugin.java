@@ -11,8 +11,10 @@ import android.content.IntentSender;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.util.Log;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
+import com.google.android.gms.auth.api.credentials.Credentials;
 import com.google.android.gms.auth.api.credentials.HintRequest;
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
@@ -57,6 +59,7 @@ public class SmsAutoFillPlugin implements MethodCallHandler {
 
             @Override
             public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+                Log.d("RAW", "DEBUG20201207 RAW: in onActivityResult - 1");
                 if (requestCode == PHONE_HINT_REQUEST && pendingHintResult != null) {
                     if (resultCode == Activity.RESULT_OK && data != null) {
                         Credential credential = data.getParcelableExtra(Credential.EXTRA_KEY);
@@ -130,23 +133,29 @@ public class SmsAutoFillPlugin implements MethodCallHandler {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.ECLAIR)
+    @TargetApi(Build.VERSION_CODES.P)
     private void requestHint() {
-        try {
+        Log.d("RAW", "DEBUG20201207 RAW: begining in requestHint - 1");
         HintRequest hintRequest = new HintRequest.Builder()
                 .setPhoneNumberIdentifierSupported(true)
+                // .setEmailAddressIdentifierSupported(true)
                 .build();
-        GoogleApiClient mCredentialsClient = new GoogleApiClient.Builder(activity)
-                .addApi(Auth.CREDENTIALS_API)
-                .build();
-        PendingIntent intent = Auth.CredentialsApi.getHintPickerIntent(
-                mCredentialsClient, hintRequest);
+        // GoogleApiClient mCredentialsClient = new GoogleApiClient.Builder(activity)
+        //        .addApi(Auth.CREDENTIALS_API)
+        //        .build();
 
+        // PendingIntent intent = Auth.CredentialsApi.getHintPickerIntent(mCredentialsClient,
+        //        hintRequest);
+
+        PendingIntent intent = Credentials.getClient(activity).getHintPickerIntent(hintRequest);
+        try {
             activity.startIntentSenderForResult(intent.getIntentSender(),
                     PHONE_HINT_REQUEST, null, 0, 0, 0);
         } catch (IntentSender.SendIntentException e) {
             e.printStackTrace();
         }
+        Log.d("RAW", "DEBUG20201207 RAW: in end requestHint - 1");
+
     }
 
     private static class SmsBroadcastReceiver extends BroadcastReceiver {
